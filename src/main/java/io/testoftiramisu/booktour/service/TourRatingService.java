@@ -8,13 +8,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Optional;
 import java.util.OptionalDouble;
 
 /** Tour Rating Service */
 @Service
+@Transactional
 public class TourRatingService {
   private TourRatingRepository tourRatingRepository;
   private TourRepository tourRepository;
@@ -47,6 +50,25 @@ public class TourRatingService {
   }
 
   /**
+   * Get All Ratings.
+   *
+   * @return List of TourRatings
+   */
+  public List<TourRating> lookupAll() {
+    return tourRatingRepository.findAll();
+  }
+
+  /**
+   * Get a ratings by id.
+   *
+   * @param id rating identifier
+   * @return TourRatings
+   */
+  public Optional<TourRating> lookupRatingById(int id) {
+    return tourRatingRepository.findById(id);
+  }
+
+  /**
    * Get a page of tour ratings for a tour.
    *
    * @param tourId tour identifier
@@ -60,13 +82,13 @@ public class TourRatingService {
   }
 
   /**
-   * Update all of the elements of a Tour Rating.
+   * Updates all of the elements of a Tour Rating.
    *
    * @param tourId tour identifier
    * @param score score of the tour rating
    * @param comment additional comment
    * @return Tour Rating Domain Object
-   * @throws NoSuchElementException if no Tour found.
+   * @throws NoSuchElementException if no Tour found
    */
   public TourRating update(int tourId, Integer customerId, Integer score, String comment)
       throws NoSuchElementException {

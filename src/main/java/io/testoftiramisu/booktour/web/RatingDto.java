@@ -1,12 +1,14 @@
 package io.testoftiramisu.booktour.web;
 
+import org.springframework.hateoas.RepresentationModel;
+
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 /** Data Transfer Object for Tour's Rating. */
-public class RatingDto {
+public class RatingDto extends RepresentationModel<RatingDto> {
 
   @Min(0)
   @Max(5)
