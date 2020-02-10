@@ -4,8 +4,9 @@ import io.testoftiramisu.booktour.domain.TourRating;
 import io.testoftiramisu.booktour.service.TourRatingService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PagedResourcesAssembler;
+import org.springframework.hateoas.PagedModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -22,19 +23,20 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.AbstractMap;
-import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.stream.Collectors;
 
 /** Tour Rating Controller. */
 @RestController
 @RequestMapping(path = "/tours/{tourId}/ratings")
 public class TourRatingController {
   private TourRatingService tourRatingService;
+  private RatingAssembler ratingAssembler;
 
   @Autowired
-  public TourRatingController(TourRatingService tourRatingService) {
+  public TourRatingController(
+      TourRatingService tourRatingService, RatingAssembler ratingAssembler) {
     this.tourRatingService = tourRatingService;
+    this.ratingAssembler = ratingAssembler;
   }
 
   protected TourRatingController() {}
@@ -65,24 +67,23 @@ public class TourRatingController {
   public void createManyTourRatings(
       @PathVariable(value = "tourId") int tourId,
       @PathVariable(value = "score") int score,
-      @RequestParam("customers") Integer customers[]) {
+      @RequestParam("customers") Integer[] customers) {
     tourRatingService.rateMany(tourId, score, customers);
   }
 
   /**
-   * Looks up a the Ratings for a tour.
+   * Returns pageable ratings for a tour.
    *
    * @param tourId tour identifier
    * @param pageable pageable object
-   * @return
    */
   @GetMapping
-  public Page<RatingDto> getAllRatingsForTour(
-      @PathVariable(value = "tourId") int tourId, Pageable pageable) {
+  public PagedModel<RatingDto> getAllRatingsForTour(
+      @PathVariable(value = "tourId") int tourId,
+      Pageable pageable,
+      PagedResourcesAssembler<TourRating> pagedResourcesAssembler) {
     Page<TourRating> tourRatingPage = tourRatingService.lookupRatings(tourId, pageable);
-    List<RatingDto> ratingDtoList =
-        tourRatingPage.getContent().stream().map(this::toDto).collect(Collectors.toList());
-    return new PageImpl<RatingDto>(ratingDtoList, pageable, tourRatingPage.getTotalPages());
+    return pagedResourcesAssembler.toModel(tourRatingPage, ratingAssembler);
   }
 
   /**
@@ -102,7 +103,7 @@ public class TourRatingController {
    * Updates score and comment of a Tour Rating.
    *
    * @param tourId tour identifier
-   * @param ratingDto
+   * @param ratingDto tour rating data transfer object
    * @return The modified Rating DTO
    */
   @PutMapping
@@ -116,7 +117,7 @@ public class TourRatingController {
    * Updates score or comment of a Tour Rating.
    *
    * @param tourId tour identifier
-   * @param ratingDto
+   * @param ratingDto tour rating data transfer object
    * @return The modified Rating DTO.
    */
   @PatchMapping
@@ -143,8 +144,8 @@ public class TourRatingController {
   /**
    * Converts the TourRating entity to a RatingDto.
    *
-   * @param tourRating
-   * @return RatingDto
+   * @param tourRating tour rating object
+   * @return RatingDto tour rating data transfer object
    */
   private RatingDto toDto(TourRating tourRating) {
     return new RatingDto(
