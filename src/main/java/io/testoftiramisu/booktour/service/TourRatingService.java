@@ -4,12 +4,14 @@ import io.testoftiramisu.booktour.domain.Tour;
 import io.testoftiramisu.booktour.domain.TourRating;
 import io.testoftiramisu.booktour.repository.TourRatingRepository;
 import io.testoftiramisu.booktour.repository.TourRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
@@ -18,6 +20,7 @@ import java.util.OptionalDouble;
 /** Tour Rating Service */
 @Service
 @Transactional
+@Slf4j
 public class TourRatingService {
   private TourRatingRepository tourRatingRepository;
   private TourRepository tourRepository;
@@ -46,6 +49,7 @@ public class TourRatingService {
    */
   public void createNew(int tourId, Integer customerId, Integer score, String comment)
       throws NoSuchElementException {
+    log.info("Create Rating for tour {} of customers {}", tourId, customerId);
     tourRatingRepository.save(new TourRating(verifyTour(tourId), customerId, score, comment));
   }
 
@@ -55,6 +59,7 @@ public class TourRatingService {
    * @return List of TourRatings
    */
   public List<TourRating> lookupAll() {
+    log.info("Lookup all Ratings");
     return tourRatingRepository.findAll();
   }
 
@@ -65,6 +70,7 @@ public class TourRatingService {
    * @return TourRatings
    */
   public Optional<TourRating> lookupRatingById(int id) {
+    log.info("Lookup Rating for tour {}", id);
     return tourRatingRepository.findById(id);
   }
 
@@ -78,6 +84,7 @@ public class TourRatingService {
    */
   public Page<TourRating> lookupRatings(int tourId, Pageable pageable)
       throws NoSuchElementException {
+    log.info("Lookup Rating for tour {}", tourId);
     return tourRatingRepository.findByTourId(verifyTour(tourId).getId(), pageable);
   }
 
@@ -92,6 +99,7 @@ public class TourRatingService {
    */
   public TourRating update(int tourId, Integer customerId, Integer score, String comment)
       throws NoSuchElementException {
+    log.info("Update all of Rating for tour {} of customers {}", tourId, customerId);
     TourRating rating = verifyTourRating(tourId, customerId);
     rating.setScore(score);
     rating.setComment(comment);
@@ -110,6 +118,7 @@ public class TourRatingService {
    */
   public TourRating updateSome(int tourId, Integer customerId, Integer score, String comment)
       throws NoSuchElementException {
+    log.info("Update some of Rating for tour {} of customers {}", tourId, customerId);
     TourRating rating = verifyTourRating(tourId, customerId);
     if (score != null) {
       rating.setScore(score);
@@ -128,6 +137,7 @@ public class TourRatingService {
    * @throws NoSuchElementException if no Tour found.
    */
   public void delete(int tourId, Integer customerId) throws NoSuchElementException {
+    log.info("Delete Rating for tour {} and customer {}", tourId, customerId);
     TourRating rating = verifyTourRating(tourId, customerId);
     tourRatingRepository.delete(rating);
   }
@@ -139,6 +149,7 @@ public class TourRatingService {
    * @throws NoSuchElementException exception
    */
   public Double getAverageScore(int tourId) throws NoSuchElementException {
+    log.info("Get average score of tour {}", tourId);
     List<TourRating> ratings = tourRatingRepository.findByTourId(verifyTour(tourId).getId());
     OptionalDouble average = ratings.stream().mapToInt(TourRating::getScore).average();
     return average.isPresent() ? average.getAsDouble() : null;
@@ -151,13 +162,14 @@ public class TourRatingService {
    * @param customers array of customer ids
    */
   public void rateMany(int tourId, int score, Integer[] customers) {
-    tourRepository
-        .findById(tourId)
-        .ifPresent(
-            tour -> {
-              for (Integer c : customers) {
-                tourRatingRepository.save(new TourRating(tour, c, score));
-              }
+    log.info("Rate tour {} by customers {}", tourId, Arrays.asList(customers).toString());
+    Tour tour = tourRepository.findById(tourId).orElseThrow(NoSuchElementException::new);
+
+    Arrays.stream(customers)
+        .forEach(
+            (c) -> {
+              log.debug("Attempt to create Tour Rating for customer {}", c);
+              tourRatingRepository.save(new TourRating(tour, c, score));
             });
   }
 
