@@ -2,14 +2,14 @@ package io.testoftiramisu.booktour.domain;
 
 /** Enumeration of regions of California. */
 public enum Region {
-  Central_Coast("Central_coast"),
-  Southern_California("Southern_California"),
-  Northern_California("Northern_California"),
+  Central_Coast("Central Coast"),
+  Southern_California("Southern California"),
+  Northern_California("Northern California"),
   Varies("Varies");
 
   private String label;
 
-  private Region(String label) {
+  Region(String label) {
     this.label = label;
   }
 
