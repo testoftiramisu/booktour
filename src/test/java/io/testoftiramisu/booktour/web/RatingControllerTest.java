@@ -76,7 +76,6 @@ public class RatingControllerTest {
   /** HTTP GET /ratings/{id} */
   @Test
   public void getOne() {
-
     when(tourRatingServiceMock.lookupRatingById(RATING_ID)).thenReturn(Optional.of(tourRatingMock));
 
     ResponseEntity<RatingDto> response =

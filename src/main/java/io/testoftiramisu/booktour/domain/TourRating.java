@@ -64,8 +64,8 @@ public class TourRating {
   /**
    * Auto Generate a message for a score.
    *
-   * @param score
-   * @return
+   * @param score provided user score
+   * @return comment based on provided score
    */
   private String toComment(Integer score) {
     switch (score) {
