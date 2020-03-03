@@ -3,19 +3,22 @@ package io.testoftiramisu.booktour.web;
 import io.testoftiramisu.booktour.domain.Tour;
 import io.testoftiramisu.booktour.domain.TourRating;
 import io.testoftiramisu.booktour.service.TourRatingService;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+
 import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.hateoas.CollectionModel;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.util.Arrays;
 import java.util.List;
@@ -30,8 +33,10 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
  *
  * <p>Do not invoke the tourRatingService methods, use Mock instead
  */
-@RunWith(SpringRunner.class)
-@SpringBootTest(webEnvironment = RANDOM_PORT)
+@ExtendWith(SpringExtension.class)
+@SpringBootTest(
+    webEnvironment = RANDOM_PORT,
+    classes = io.testoftiramisu.booktour.BooktourApplication.class)
 public class RatingControllerTest {
   private static final String RATINGS_URL = "/ratings";
 
@@ -50,7 +55,7 @@ public class RatingControllerTest {
 
   @Autowired private TestRestTemplate restTemplate;
 
-  @Before
+  @BeforeEach
   public void setupReturnValuesOfMockMethods() {
     when(tourRatingMock.getTour()).thenReturn(tourMock);
     when(tourMock.getId()).thenReturn(TOUR_ID);
@@ -65,7 +70,7 @@ public class RatingControllerTest {
     when(tourRatingServiceMock.lookupAll())
         .thenReturn(Arrays.asList(tourRatingMock, tourRatingMock, tourRatingMock));
 
-    ResponseEntity<List<RatingDto>> response =
+    ResponseEntity<CollectionModel<RatingDto>> response =
         restTemplate.exchange(
             RATINGS_URL, HttpMethod.GET, null, new ParameterizedTypeReference<>() {});
 

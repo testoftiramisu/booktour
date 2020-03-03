@@ -2,22 +2,22 @@ package io.testoftiramisu.booktour.web;
 
 import io.testoftiramisu.booktour.domain.Tour;
 import io.testoftiramisu.booktour.domain.TourRating;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.rest.webmvc.support.RepositoryEntityLinks;
 import org.springframework.hateoas.Link;
 
-import static org.junit.Assert.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class RatingAssemblerTest {
   private static final int TOUR_ID = 999;
   private static final int RATING_ID = 555;
@@ -45,6 +45,6 @@ public class RatingAssemblerTest {
 
     RatingDto dto = assembler.toModel(tourRatingMock);
 
-    assertTrue(dto.getLinks().hasSize(2));
+    assertThat(dto.getLinks()).hasSize(2);
   }
 }

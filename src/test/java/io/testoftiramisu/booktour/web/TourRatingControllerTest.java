@@ -3,10 +3,10 @@ package io.testoftiramisu.booktour.web;
 import io.testoftiramisu.booktour.domain.Tour;
 import io.testoftiramisu.booktour.domain.TourRating;
 import io.testoftiramisu.booktour.service.TourRatingService;
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -18,13 +18,12 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
-import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.verify;
@@ -36,8 +35,10 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
  *
  * <p>Do not invoke the tourRatingService methods, use Mock instead
  */
-@RunWith(SpringRunner.class)
-@SpringBootTest(webEnvironment = RANDOM_PORT)
+@ExtendWith(SpringExtension.class)
+@SpringBootTest(
+    webEnvironment = RANDOM_PORT,
+    classes = io.testoftiramisu.booktour.BooktourApplication.class)
 public class TourRatingControllerTest {
 
   // These Tour and rating id's do not already exist in the db
@@ -57,7 +58,7 @@ public class TourRatingControllerTest {
 
   private RatingDto ratingDto = new RatingDto(SCORE, COMMENT, CUSTOMER_ID);
 
-  @Before
+  @BeforeEach
   public void setupReturnValuesOfMockMethods() {
     when(tourRatingMock.getComment()).thenReturn(COMMENT);
     when(tourRatingMock.getScore()).thenReturn(SCORE);
@@ -94,13 +95,13 @@ public class TourRatingControllerTest {
   /** HTTP GET /tours/{tourId}/ratings */
   @Test
   public void getAllRatingsForTour() throws Exception {
-    List<TourRating> listOfTourRatings = Arrays.asList(tourRatingMock);
+    List<TourRating> listOfTourRatings = Collections.singletonList(tourRatingMock);
     Page<TourRating> page = new PageImpl(listOfTourRatings, PageRequest.of(0, 10), 1);
     when(serviceMock.lookupRatings(anyInt(), any(Pageable.class))).thenReturn(page);
 
     ResponseEntity<String> response = restTemplate.getForEntity(TOUR_RATINGS_URL, String.class);
 
-    assertThat(response.getStatusCode(), is(HttpStatus.OK));
+    assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
     verify(serviceMock).lookupRatings(anyInt(), any(Pageable.class));
   }
 
@@ -112,8 +113,8 @@ public class TourRatingControllerTest {
     ResponseEntity<String> response =
         restTemplate.getForEntity(TOUR_RATINGS_URL + "/average", String.class);
 
-    assertThat(response.getStatusCode(), is(HttpStatus.OK));
-    assertThat(response.getBody(), is("{\"average\":3.2}"));
+    assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+    assertThat(response.getBody()).isEqualTo("{\"average\":3.2}");
   }
 
   /** HTTP PUT /tours/{tourId}/ratings */
@@ -135,7 +136,7 @@ public class TourRatingControllerTest {
    * restTemplate.getRestTemplate().setRequestFactory(new HttpComponentsClientHttpRequestFactory());
    */
   @Test
-  @Ignore
+  @Disabled
   public void updateWithPatch() {
     when(serviceMock.updateSome(TOUR_ID, CUSTOMER_ID, SCORE, COMMENT)).thenReturn(tourRatingMock);
 

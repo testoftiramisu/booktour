@@ -4,28 +4,28 @@ import io.testoftiramisu.booktour.domain.Tour;
 import io.testoftiramisu.booktour.domain.TourRating;
 import io.testoftiramisu.booktour.repository.TourRatingRepository;
 import io.testoftiramisu.booktour.repository.TourRepository;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import java.util.Collections;
 import java.util.Optional;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class TourRatingServiceTest {
 
   private static final int CUSTOMER_ID = 123;
@@ -41,13 +41,15 @@ public class TourRatingServiceTest {
   @Mock private TourRating tourRatingMock;
 
   /** Mock responses to commonly invoked methods. */
-  @Before
+  @BeforeEach
   public void setupReturnValuesOfMockMethods() {
-    when(tourRepositoryMock.findById(TOUR_ID)).thenReturn(Optional.of(tourMock));
-    when(tourMock.getId()).thenReturn(TOUR_ID);
-    when(tourRatingRepositoryMock.findByTourIdAndCustomerId(TOUR_ID, CUSTOMER_ID))
+    lenient().when(tourRepositoryMock.findById(TOUR_ID)).thenReturn(Optional.of(tourMock));
+    lenient().when(tourMock.getId()).thenReturn(TOUR_ID);
+    lenient()
+        .when(tourRatingRepositoryMock.findByTourIdAndCustomerId(TOUR_ID, CUSTOMER_ID))
         .thenReturn(Optional.of(tourRatingMock));
-    when(tourRatingRepositoryMock.findByTourId(TOUR_ID))
+    lenient()
+        .when(tourRatingRepositoryMock.findByTourId(TOUR_ID))
         .thenReturn(Collections.singletonList(tourRatingMock));
   }
 
@@ -57,7 +59,7 @@ public class TourRatingServiceTest {
     when(tourRatingRepositoryMock.findById(TOUR_RATING_ID)).thenReturn(Optional.of(tourRatingMock));
 
     // invoke and verify lookupRatingById
-    assertThat(service.lookupRatingById(TOUR_RATING_ID).get(), is(tourRatingMock));
+    assertThat(service.lookupRatingById(TOUR_RATING_ID).get()).isEqualTo(tourRatingMock);
   }
 
   @Test
@@ -65,7 +67,7 @@ public class TourRatingServiceTest {
     when(tourRatingRepositoryMock.findAll()).thenReturn(Collections.singletonList(tourRatingMock));
 
     // invoke and verify lookupAll
-    assertThat(service.lookupAll().get(0), is(tourRatingMock));
+    assertThat(service.lookupAll().get(0)).isEqualTo(tourRatingMock);
   }
 
   @Test
@@ -73,7 +75,7 @@ public class TourRatingServiceTest {
     when(tourRatingMock.getScore()).thenReturn(10);
 
     // invoke and verify getAverageScore
-    assertThat(service.getAverageScore(TOUR_ID), is(10.0));
+    assertThat(service.getAverageScore(TOUR_ID)).isEqualTo(10.0);
   }
 
   @Test
@@ -84,7 +86,7 @@ public class TourRatingServiceTest {
     when(tourRatingRepositoryMock.findByTourId(1, pageable)).thenReturn(page);
 
     // invoke and verify lookupRatings
-    assertThat(service.lookupRatings(TOUR_ID, pageable), is(page));
+    assertThat(service.lookupRatings(TOUR_ID, pageable)).isEqualTo(page);
   }
 
   /** Verifies the invocation of dependencies. */
@@ -145,9 +147,9 @@ public class TourRatingServiceTest {
     verify(tourRatingRepositoryMock).save(tourRatingCaptor.capture());
 
     // verify the attributes of the Tour Rating Object
-    assertThat(tourRatingCaptor.getValue().getTour(), is(tourMock));
-    assertThat(tourRatingCaptor.getValue().getCustomerId(), is(CUSTOMER_ID));
-    assertThat(tourRatingCaptor.getValue().getScore(), is(2));
-    assertThat(tourRatingCaptor.getValue().getComment(), is("ok"));
+    assertThat(tourRatingCaptor.getValue().getTour()).isEqualTo(tourMock);
+    assertThat(tourRatingCaptor.getValue().getCustomerId()).isEqualTo(CUSTOMER_ID);
+    assertThat(tourRatingCaptor.getValue().getScore()).isEqualTo(2);
+    assertThat(tourRatingCaptor.getValue().getComment()).isEqualTo("ok");
   }
 }
