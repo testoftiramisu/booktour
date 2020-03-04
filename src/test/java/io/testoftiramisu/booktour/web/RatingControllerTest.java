@@ -3,11 +3,9 @@ package io.testoftiramisu.booktour.web;
 import io.testoftiramisu.booktour.domain.Tour;
 import io.testoftiramisu.booktour.domain.TourRating;
 import io.testoftiramisu.booktour.service.TourRatingService;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-
 import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -21,7 +19,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.util.Arrays;
-import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -72,7 +69,7 @@ public class RatingControllerTest {
 
     ResponseEntity<CollectionModel<RatingDto>> response =
         restTemplate.exchange(
-            RATINGS_URL, HttpMethod.GET, null, new ParameterizedTypeReference<>() {});
+            RATINGS_URL, HttpMethod.GET, null, createParameterizedTypeReference());
 
     assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
     assertThat(response.getBody()).hasSize(3);
@@ -90,5 +87,18 @@ public class RatingControllerTest {
     assertThat(response.getBody().getCustomerId()).isEqualTo(CUSTOMER_ID);
     assertThat(response.getBody().getComment()).isEqualTo(COMMENT);
     assertThat(response.getBody().getScore()).isEqualTo(SCORE);
+  }
+
+  /**
+   * Fixes NullPointerException during compilation of Generic ParameterizedTypeReference.
+   *
+   * <p>javac can't tell during speculative attribution if a diamond expression is creating an
+   * anonymous inner class or not.
+   *
+   * @return parameterized type reference of <CollectionModel<RatingDto>> type
+   */
+  private ParameterizedTypeReference<CollectionModel<RatingDto>>
+      createParameterizedTypeReference() {
+    return new ParameterizedTypeReference<>() {};
   }
 }
