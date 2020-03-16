@@ -6,8 +6,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 @ExtendWith(SpringExtension.class)
-@SpringBootTest(classes = io.testoftiramisu.booktour.BooktourApplicationTests.class)
-class BooktourApplicationTests {
+@SpringBootTest(classes = TourAppTests.class)
+class TourAppTests {
 
   @Test
   void contextLoads() {}

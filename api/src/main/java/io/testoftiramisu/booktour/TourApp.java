@@ -1,7 +1,5 @@
 package io.testoftiramisu.booktour;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
@@ -18,8 +16,7 @@ import static springfox.documentation.builders.PathSelectors.any;
 
 @SpringBootApplication
 @EnableSwagger2WebMvc
-public class BooktourApplication {
-  private static Logger logger = LoggerFactory.getLogger(BooktourApplication.class);
+public class TourApp {
 
   @Bean
   public Docket docket() {
@@ -37,10 +34,10 @@ public class BooktourApplication {
                 new Contact("Github", "http://github.com/testoftiramisu/booktour", ""),
                 null,
                 null,
-                new ArrayList()));
+                new ArrayList<>()));
   }
 
   public static void main(String[] args) {
-    SpringApplication.run(BooktourApplication.class, args);
+    SpringApplication.run(TourApp.class, args);
   }
 }

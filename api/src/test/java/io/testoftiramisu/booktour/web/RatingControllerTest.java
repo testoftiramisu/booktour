@@ -1,5 +1,6 @@
 package io.testoftiramisu.booktour.web;
 
+import io.testoftiramisu.booktour.TourApp;
 import io.testoftiramisu.booktour.domain.Tour;
 import io.testoftiramisu.booktour.domain.TourRating;
 import io.testoftiramisu.booktour.service.TourRatingService;
@@ -33,7 +34,7 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(
     webEnvironment = RANDOM_PORT,
-    classes = io.testoftiramisu.booktour.BooktourApplication.class)
+    classes = TourApp.class)
 public class RatingControllerTest {
   private static final String RATINGS_URL = "/ratings";
 
